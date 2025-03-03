@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  product-tracker-bot:
+    build: .
+    container_name: product_tracker_bot
+    volumes:
+      - ./data:/app/data
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=sqlite:///data/prices.db
+    restart: unless-stopped
+
+  webhook-service:
+    build: .
+    container_name: webhook_service
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///data/prices.db
+    restart: unless-stopped
