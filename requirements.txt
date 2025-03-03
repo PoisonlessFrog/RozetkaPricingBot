@@ -1,7 +1,0 @@
-aiogram
-requests
-beautifulsoup4
-sqlalchemy
-python-dotenv
-uvicorn
-fastapi
