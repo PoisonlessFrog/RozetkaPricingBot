@@ -3,27 +3,26 @@ import sqlite3
 DB_NAME = "prices.db"
 
 def init_db():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect('prices.db')
     cursor = conn.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS product_prices (
-                        url TEXT PRIMARY KEY,
-                        last_price REAL
-                     )''')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS products (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        url TEXT UNIQUE,
-                        chat_id INTEGER
-                     )''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS products (
+            url TEXT PRIMARY KEY,
+            price REAL,
+            available INTEGER,
+            chat_id INTEGER
+        )
+    ''')
     conn.commit()
     conn.close()
 
 def get_last_price(url):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect('prices.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT last_price FROM product_prices WHERE url = ?", (url,))
-    result = cursor.fetchone()
+    cursor.execute('SELECT price FROM products WHERE url = ?', (url,))
+    price = cursor.fetchone()
     conn.close()
-    return result[0] if result else None
+    return price[0] if price else None
 
 def update_price(url, price):
     conn = sqlite3.connect(DB_NAME)
@@ -32,31 +31,30 @@ def update_price(url, price):
     conn.commit()
     conn.close()
 
-def add_product(url, price=None, available=None, chat_id=None):
-    conn = sqlite3.connect(DB_NAME)
+def add_product(url, price, available, chat_id):
+    conn = sqlite3.connect('prices.db')
     cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO products (url, chat_id) VALUES (?, ?)", (url, chat_id))
-    if price is not None and available is not None:
-        cursor.execute("INSERT INTO product_prices (url, last_price) VALUES (?, ?) ON CONFLICT(url) DO UPDATE SET last_price = ?",
-                       (url, price, price))
+    cursor.execute('''
+        INSERT OR REPLACE INTO products (url, price, available, chat_id)
+        VALUES (?, ?, ?, ?)
+    ''', (url, price, available, chat_id))
     conn.commit()
     conn.close()
 
 def delete_product(url):
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect('prices.db')
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM product_prices WHERE url = ?", (url,))
-    cursor.execute("DELETE FROM products WHERE url = ?", (url,))
+    cursor.execute('DELETE FROM products WHERE url = ?', (url,))
     conn.commit()
     conn.close()
 
 def get_all_products():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect('prices.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT url, chat_id FROM products")
-    rows = cursor.fetchall()
+    cursor.execute('SELECT url, price, available FROM products')
+    products = cursor.fetchall()
     conn.close()
-    return rows
+    return products
 
 
 # Initialize database on first run
