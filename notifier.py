@@ -1,4 +1,3 @@
-import asyncio
 from aiogram import Bot
 from config import TELEGRAM_BOT_TOKEN
 
