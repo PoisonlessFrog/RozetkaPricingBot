@@ -1,7 +1,9 @@
 import asyncio
-from aiogram import Bot, Dispatcher, Router, types
+
+from aiogram import Bot, Dispatcher, Router
 from aiogram.filters import Command
 from aiogram.types import Message
+
 from config import TELEGRAM_BOT_TOKEN
 from database import init_db, add_product, get_all_products, get_last_price, delete_product
 from marketplace_scraper import scrape_product
@@ -46,7 +48,7 @@ async def product_watcher():
 
             add_product(product_url, product.price, product.available, chat_id)
 
-        await asyncio.sleep(30)
+        await asyncio.sleep(300)
 
 
 async def list_products_cmd(msg: Message):
@@ -74,23 +76,6 @@ router.message.register(start_cmd, Command(commands=["start"]))
 router.message.register(add_product_cmd, Command(commands=["add"]))
 router.message.register(list_products_cmd, Command(commands=["list"]))
 
-
-# async def product_watcher():
-#     while True:
-#         for product_url in get_all_products():
-#             product = scrape_product(product_url)
-#
-#             if product is None:
-#                 continue
-#
-#             if product.price <= get_last_price(product_url):
-#                 await notify_user(WATCHERS.get(product_url), f"Price dropped for {product.name}: ${product.price}")
-#             elif not get_last_price(product_url) and product.available:
-#                 await notify_user(WATCHERS.get(product_url), f"{product.name} is back in stock!")
-#
-#             add_product(product_url, product.price, product.available)
-#
-#         await asyncio.sleep(36)
 
 async def main():
     init_db()

@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Request
-import asyncio
 from notifier import notify_user
 
 app = FastAPI()
